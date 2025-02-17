@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import React, { useState } from "react";
 import Step from "@/components/form/Step";
 import Input from "@/components/Input";
 import TextArea from "@/components/TextArea";
@@ -8,6 +8,13 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import axios from "axios";
 import { useRouter } from "next/navigation";
 import { useToast } from "@/components/toast/ToastProvider";
+import Switch from "@/components/Switch";
+import PercentageInput from "@/components/PercentageInput";
+import Button from "@/components/Button";
+import sessionFormSchema from "@/FormValidationSchema/sessionFormSchema";
+import { createSession, updateSession } from "@/server-actions/sessionAction";
+import useApiHandler from "@/hooks/useApiHandler";
+import SuccessMessage from "@/components/SuccessMessage";
 
 const inputForm = [
   {
@@ -29,79 +36,81 @@ const inputForm = [
     fullWidth: true,
   },
   {
+    name: "autoReject",
+    label: "Auto Reject",
+    type: "password",
+    component: Switch,
+    defaultValue: true,
+  },
+  {
     name: "threshold",
     label: "Acceptance Threshold",
     type: "number",
-    component: Input,
-    defaultValue: "0",
+    component: PercentageInput,
+    defaultValue: 60,
   },
 ];
 
 const CreateListingForm = ({ id, user }) => {
   const router = useRouter();
   const { addToast } = useToast();
+  const [isSubmitted, setSubmitted] = useState(false);
+
   const methods = useForm({
-    // resolver: zodResolver(stepsData[currentStep].schema),
+    resolver: zodResolver(sessionFormSchema),
     mode: "onBlur",
   });
-
-  const handleSaveForm = async (currentPage, pageData, title) => {
+  const createOrUpdateSession = useApiHandler(async (data) => {
     try {
-      const res = await axios.post("/api/forms/save", {
-        id: id,
-        userId: user.id,
-        currentPage: currentPage,
-        pageData: pageData,
-        title: title,
-        type: "listing",
-      });
-      addToast("info", "Form saved successfully, you can submit within 2 days");
-      if (res.data?.redirectUrl) {
-        router.push(res.data?.redirectUrl);
+      let response;
+      if (id) {
+        response = await updateSession(id, data);
+      } else {
+        response = await createSession(data);
       }
-    } catch (error) {
-      addToast("error", "Error while auto-saving form, try again!");
-      console.error(error);
-    }
-  };
-  const fetchCurrentPageData = async () => {
-    try {
-      if (id !== "new") {
-        const res = await axios.get(`/api/forms/${id}`, {});
+      if (response.success) {
+        setSubmitted(true);
+        addToast("info", response.message || "Form Submitted Successfully");
+        methods.reset();
+      } else {
         addToast(
-          "info",
-          "Your data has been auto-saved. You can continue where you left off."
+          "error",
+          response.message || "An error occurred. Please try again."
         );
-        return {
-          pageData: res.data.pageData,
-          currentPage: res?.data.currentPage,
-        };
       }
-      return { pageData: {}, currentPage: -1 };
-    } catch (error) {
-      console.error(error);
-      addToast("error", "Error while loading auto-saved form data");
-      return { pageData: {}, currentPage: -1 }; // Consistent return structure
-    }
-  };
-  const handleFormSubmit = async (data) => {
-    try {
-      console.log(data)
     } catch (error) {
       console.error(error)
+      addToast(
+        "error",
+        error.message || "Some error occurred while processing the session."
+      );
     }
-    finally{
-      
-    }
+  });
+  const handleFormSubmit = async (data) => {
+    await createOrUpdateSession.execute(data);
   };
+  if (isSubmitted) {
+    return <SuccessMessage message={"Submitted form sucessfully."} />;
+  }
+
   return (
-    <div>
+    <div className="flex justify-center items-center min-h-screen bg-gray-100 p-4">
       <FormProvider {...methods}>
         <form
           onSubmit={methods.handleSubmit(handleFormSubmit)}
-          className="max-w-3xl mx-auto p-4  lg:p-8 bg-white shadow-lg  rounded-lg md:max-w-[500px] lg:max-w-[600px] pt-8"
+          className="w-full max-w-lg p-8 bg-white shadow-lg rounded-xl"
         >
+          <h1 className="text-2xl font-medium text-gray-800 mb-6 tracking-wide text-center">
+            {id ? "Update" : "Create New"} Session
+          </h1>
           <Step fields={inputForm} />
+          <Button
+            type="submit"
+            className="w-full mt-6"
+            loading={createOrUpdateSession.apiState.loading}
+          >
+            Submit
+          </Button>
         </form>
       </FormProvider>
     </div>

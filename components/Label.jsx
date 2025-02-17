@@ -6,7 +6,7 @@ const Label = ({ label, htmlFor, className = "", ...props }) => {
       {label && (
         <label
           htmlFor={htmlFor}
-          className={`text-gray-700 text-[0.9em] font-medium mb-1 tracking-wide ${className}`}
+          className={`text-gray-700 text-[0.9em] font-medium mb-1 tracking-wide text-nowrap ${className}`}
           {...props}
         >
           {label}
