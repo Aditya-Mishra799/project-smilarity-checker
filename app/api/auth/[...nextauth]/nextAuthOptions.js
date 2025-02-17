@@ -35,12 +35,11 @@ const authOptions = {
             throw new Error("Invalid email or password.");
           }
           return {
-            id: user._id.toString(),
+            id : user._id,
             email: user.email,
-            name: user.name,
-            role: user.role,
-            image: user.image
-          };
+            name : user.name,
+            picture : user.profileImageUrl,
+          }
         } catch (error) {
           return null
           console.error(error)
@@ -60,16 +59,14 @@ const authOptions = {
     async jwt({token, user, account, isNewUser, trigger}) {
       if(user){
         token.id = user.id
-        token.role = user.role;
-        token.image = user.image
+        token.picture = user.picture
       } 
       return token;
     },
     async session({session, token}) {
       if(token){
-        session.user.id = token.id;
-        session.user.role = token.role;
-        session.user.image = token.image
+        session.user.id = token.id
+        session.user.image = token.picture
       }
       return session;
     },
