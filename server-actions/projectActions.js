@@ -28,7 +28,7 @@ export const getProjectDetails = async (projectId) => {
       throw new ClientError("Associated session not found");
     }
 
-    const isCreator = project.creator._id.toString() === user.id;
+    const isCreator = project?.creator ? project.creator._id.toString() === user.id : false;
     const isSessionAdmin = 
       session.creator.toString() === user.id || 
       session.coAdmins.includes(user.id);
@@ -42,10 +42,10 @@ export const getProjectDetails = async (projectId) => {
           ...project,
           _id: project._id.toString(),
           sessionId: project.sessionId.toString(),
-          creator: {
+          creator: project.creator ? {
             ...project.creator,
             _id: project.creator._id.toString()
-          }
+          }: {}
         },
         userAccess: {
           isCreator,

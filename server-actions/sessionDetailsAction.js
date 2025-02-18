@@ -129,13 +129,13 @@ export const getSessionProjects = async (
       }
     };
   } catch (error) {
+    console.error("Error while fetching projects:", error)
     if (error instanceof ClientError) {
       return {
         success: false,
         error: error.message
       };
     }
-    console.error("Error while fetching projects:", error)
     return {
       success: false,
       error: "Failed to fetch session projects"
