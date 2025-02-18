@@ -157,7 +157,11 @@ export const getSessionById = async (sessionId) => {
   }
 };
 
-export const getAllSessions = async ( page = 1, limit = 10 ) => {
+export const getAllSessions = async (
+  page = 1,
+  limit = 10,
+  filters = {}
+) => {
   try {
     const { user } = await getServerSession(authOptions);
     if (!user || !user.id) {
@@ -166,8 +170,23 @@ export const getAllSessions = async ( page = 1, limit = 10 ) => {
 
     await connectToDB();
     const skip = (page - 1) * limit;
+
+    // Build query based on filters
+    const query = {};
+    
+    if (filters.search) {
+      query.$or = [
+        { name: { $regex: filters.search, $options: 'i' } },
+        { description: { $regex: filters.search, $options: 'i' } }
+      ];
+    }
+    
+    if (filters.status && filters.status !== 'all') {
+      query.status = filters.status;
+    }
+
     const sessions = await Session.find(
-      {},
+      query,
       {
         creator: 1,
         name: 1,
@@ -179,11 +198,10 @@ export const getAllSessions = async ( page = 1, limit = 10 ) => {
     )
       .skip(skip)
       .limit(limit)
-      .sort({ createdAt: -1 }); // Sorting sessions by creation date (descending)
+      .sort({ createdAt: -1 });
 
-    const totalSessions = await Session.countDocuments();
+    const totalSessions = await Session.countDocuments(query);
 
-    // Convert ObjectIds to strings for each session
     const sessionData = sessions.map((session) => ({
       ...session.toObject(),
       _id: session._id.toString(),
@@ -199,25 +217,36 @@ export const getAllSessions = async ( page = 1, limit = 10 ) => {
         totalSessions,
         totalPages: Math.ceil(totalSessions / limit),
         currentPage: page,
+        limit: limit,
       },
     };
   } catch (error) {
     if (error instanceof ClientError) {
       return {
         success: false,
-        message:
-          error.message || "Some error occurred while fetching sessions.",
+        message: error.message || "Some error occurred while fetching sessions.",
         error: error.message,
-        data: {},
+        data: {
+          sessions: [],
+          totalSessions: 0,
+          totalPages: 0,
+          currentPage: page,
+          limit: limit,
+        },
       };
     } else {
       console.error(error);
       return {
         success: false,
-        message:
-          "An unexpected error occurred while fetching sessions. Please try again later.",
+        message: "An unexpected error occurred while fetching sessions. Please try again later.",
         error: null,
-        data: {},
+        data: {
+          sessions: [],
+          totalSessions: 0,
+          totalPages: 0,
+          currentPage: page,
+          limit: limit,
+        },
       };
     }
   }

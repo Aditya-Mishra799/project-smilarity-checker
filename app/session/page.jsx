@@ -6,7 +6,7 @@ import SavedSesssionPage from "./SavedSessionPage";
 const page = async () => {
   const formsResponse = await getAllSessions(1, appConfig.paginationItemsPerPage);
   return <div>
-    <SavedSesssionPage success = {formsResponse?.success}  sessions = {formsResponse?.data?.sessions}/>
+    <SavedSesssionPage success = {formsResponse?.success}  {...formsResponse?.data}/>
   </div>;
 };
 

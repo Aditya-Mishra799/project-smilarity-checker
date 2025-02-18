@@ -4,6 +4,8 @@ import "./globals.css";
 import { getServerSession } from "next-auth";
 import authOptions from "./api/auth/[...nextauth]/nextAuthOptions";
 import ToastProvider, { useToast } from "@/components/toast/ToastProvider";
+import { SessionProvider } from "next-auth/react";
+import SessionProviderWrapper from "./SessionProviderWrapper";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -28,9 +30,11 @@ export default async function RootLayout({ children }) {
         className={`${geistSans.variable} ${geistMono.variable} antialiased bg-gray-100 `}
       >
         <Navbar user={session?.user} />
-        <ToastProvider>
-          <div className="mx-4 my-6 lg:my-8 lg:mx-8">{children}</div>
-        </ToastProvider>
+        <SessionProviderWrapper>
+          <ToastProvider>
+            <div className="mx-4 my-6 lg:my-8 lg:mx-8">{children}</div>
+          </ToastProvider>
+        </SessionProviderWrapper>
       </body>
     </html>
   );

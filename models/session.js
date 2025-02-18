@@ -38,10 +38,9 @@ const sessionSchema = new mongoose.Schema({
     default: 'active',
   },
 }, {
-  timestamps: true, // Enable timestamps for createdAt and updatedAt
+  timestamps: true,
 });
 
-// Create and export the model
 const Session = mongoose.models.Session || mongoose.model('Session', sessionSchema);
 
 export default Session;
