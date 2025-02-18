@@ -14,6 +14,7 @@ const NavLinks = ({user}) => {
           innerComponent: <ProfileMenu  user={ user }/>
         },
         { title: 'About', href: '/about', visibility: true },
+        { title: 'Sessions', href: '/session', visibility: true },
         { title: 'Contact', href: '/contact', visibility: true },
       ];
       return (

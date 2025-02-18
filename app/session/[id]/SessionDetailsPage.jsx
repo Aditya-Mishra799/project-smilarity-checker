@@ -32,6 +32,7 @@ import ConfirmationDialog from "@/components/ConfirmationDialog";
 
 const SessionDetailsPage = ({ id, session, userAccess }) => {
   const { data: sessionData } = useSession();
+  console.log(sessionData)
   const { addToast } = useToast();
   const [activeTab, setActiveTab] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
@@ -55,7 +56,6 @@ const SessionDetailsPage = ({ id, session, userAccess }) => {
     pages: 1,
     page: 1,
   });
-
   // Filters state
   const [projectFilters, setProjectFilters] = useState({
     search: "",
@@ -195,12 +195,14 @@ const SessionDetailsPage = ({ id, session, userAccess }) => {
       header: "Actions",
       cell: ({ row }) => (
         <div className="flex items-center gap-2">
-          <Link
+          {
+          (userAccess.hasAdminAccess || userAccess.isCreator)  && (<Link
             href={`/session/${session._id}/project/${row.original._id}`}
             className="p-1 hover:bg-blue-50 rounded-full text-blue-600"
           >
             <Edit size={16} />
-          </Link>
+          </Link>)
+          }
           {userAccess.hasAdminAccess && (
             <button
               onClick={() => setConfirmDialog({
@@ -266,18 +268,18 @@ const SessionDetailsPage = ({ id, session, userAccess }) => {
     <div className="container mx-auto px-4 py-8">
       <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
         <div className="p-6 border-b border-gray-200">
-          <div className="flex justify-between items-start mb-4">
+          <div className="flex flex-col md:flex-row justify-between items-start gap-4 mb-4">
             <div>
               <h1 className="text-2xl font-bold text-gray-900">
                 {session.name}
               </h1>
               <p className="text-gray-600 mt-1">{session.description}</p>
             </div>
-            <div className="flex items-center gap-4">
+            <div className="flex flex-wrap items-center gap-4 w-full md:w-auto">
               {userAccess.hasAdminAccess && (
                 <Link
                   href={`/session/${id}/bulk-upload`}
-                  className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                  className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 w-full md:w-auto justify-center"
                 >
                   <Upload className="h-4 w-4 mr-2" />
                   Bulk Upload
@@ -285,14 +287,14 @@ const SessionDetailsPage = ({ id, session, userAccess }) => {
               )}
               <Link
                 href={`/session/${id}/project`}
-                className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-indigo-700 bg-indigo-100 hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-indigo-700 bg-indigo-100 hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 w-full md:w-auto justify-center"
               >
                 Add Project
               </Link>
               {userAccess.isCreator && (
                 <Link
                   href={`/create-session?id=${id}`}
-                  className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-gray-700 bg-gray-100 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
+                  className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-gray-700 bg-gray-100 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 w-full md:w-auto justify-center"
                 >
                   <Edit className="h-4 w-4 mr-2" />
                   Edit Session
@@ -334,9 +336,9 @@ const SessionDetailsPage = ({ id, session, userAccess }) => {
             }
           }}
         >
-          <TabList className="flex border-b border-gray-200">
+          <TabList className="flex border-b border-gray-200 overflow-x-auto">
             <Tab
-              className="px-6 py-4 text-sm font-medium text-gray-500 hover:text-gray-700 hover:border-gray-300 cursor-pointer"
+              className="px-6 py-4 text-sm font-medium text-gray-500 hover:text-gray-700 hover:border-gray-300 cursor-pointer whitespace-nowrap"
               selectedClassName="text-indigo-600 border-b-2 border-indigo-500"
             >
               <div className="flex items-center gap-2">
@@ -345,7 +347,7 @@ const SessionDetailsPage = ({ id, session, userAccess }) => {
               </div>
             </Tab>
             <Tab
-              className="px-6 py-4 text-sm font-medium text-gray-500 hover:text-gray-700 hover:border-gray-300 cursor-pointer"
+              className="px-6 py-4 text-sm font-medium text-gray-500 hover:text-gray-700 hover:border-gray-300 cursor-pointer whitespace-nowrap"
               selectedClassName="text-indigo-600 border-b-2 border-indigo-500"
             >
               <div className="flex items-center gap-2">
@@ -354,7 +356,7 @@ const SessionDetailsPage = ({ id, session, userAccess }) => {
               </div>
             </Tab>
             <Tab
-              className="px-6 py-4 text-sm font-medium text-gray-500 hover:text-gray-700 hover:border-gray-300 cursor-pointer"
+              className="px-6 py-4 text-sm font-medium text-gray-500 hover:text-gray-700 hover:border-gray-300 cursor-pointer whitespace-nowrap"
               selectedClassName="text-indigo-600 border-b-2 border-indigo-500"
             >
               <div className="flex items-center gap-2">
@@ -372,63 +374,65 @@ const SessionDetailsPage = ({ id, session, userAccess }) => {
                     Co-Administrators
                   </h3>
                   <div className="bg-white rounded-lg shadow overflow-hidden">
-                    <table className="min-w-full divide-y divide-gray-200">
-                      <thead className="bg-gray-50">
-                        <tr>
-                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Name
-                          </th>
-                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Email
-                          </th>
-                          {userAccess.isCreator && (
-                            <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                              Actions
+                    <div className="overflow-x-auto">
+                      <table className="min-w-full divide-y divide-gray-200">
+                        <thead className="bg-gray-50">
+                          <tr>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                              Name
                             </th>
-                          )}
-                        </tr>
-                      </thead>
-                      <tbody className="bg-white divide-y divide-gray-200">
-                        {session.coAdmins.map((admin) => (
-                          <tr key={admin._id} className="hover:bg-gray-50">
-                            <td className="px-6 py-4 whitespace-nowrap">
-                              <div className="text-sm font-medium text-gray-900">
-                                {admin.name}
-                              </div>
-                            </td>
-                            <td className="px-6 py-4 whitespace-nowrap">
-                              <div className="text-sm text-gray-500">
-                                {admin.email}
-                              </div>
-                            </td>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                              Email
+                            </th>
                             {userAccess.isCreator && (
-                              <td className="px-6 py-4 whitespace-nowrap text-right">
-                                <button
-                                  onClick={() => setConfirmDialog({
-                                    isOpen: true,
-                                    type: 'removeCoAdmin',
-                                    data: admin._id
-                                  })}
-                                  className="text-red-600 hover:text-red-900"
-                                >
-                                  <UserMinus size={20} />
-                                </button>
-                              </td>
+                              <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Actions
+                              </th>
                             )}
                           </tr>
-                        ))}
-                        {session.coAdmins.length === 0 && (
-                          <tr>
-                            <td
-                              colSpan={userAccess.isCreator ? 3 : 2}
-                              className="px-6 py-4 text-center text-sm text-gray-500"
-                            >
-                              No co-administrators assigned
-                            </td>
-                          </tr>
-                        )}
-                      </tbody>
-                    </table>
+                        </thead>
+                        <tbody className="bg-white divide-y divide-gray-200">
+                          {session.coAdmins.map((admin) => (
+                            <tr key={admin._id} className="hover:bg-gray-50">
+                              <td className="px-6 py-4 whitespace-nowrap">
+                                <div className="text-sm font-medium text-gray-900">
+                                  {admin.name}
+                                </div>
+                              </td>
+                              <td className="px-6 py-4 whitespace-nowrap">
+                                <div className="text-sm text-gray-500">
+                                  {admin.email}
+                                </div>
+                              </td>
+                              {userAccess.isCreator && (
+                                <td className="px-6 py-4 whitespace-nowrap text-right">
+                                  <button
+                                    onClick={() => setConfirmDialog({
+                                      isOpen: true,
+                                      type: 'removeCoAdmin',
+                                      data: admin._id
+                                    })}
+                                    className="text-red-600 hover:text-red-900"
+                                  >
+                                    <UserMinus size={20} />
+                                  </button>
+                                </td>
+                              )}
+                            </tr>
+                          ))}
+                          {session.coAdmins.length === 0 && (
+                            <tr>
+                              <td
+                                colSpan={userAccess.isCreator ? 3 : 2}
+                                className="px-6 py-4 text-center text-sm text-gray-500"
+                              >
+                                No co-administrators assigned
+                              </td>
+                            </tr>
+                          )}
+                        </tbody>
+                      </table>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -452,14 +456,14 @@ const SessionDetailsPage = ({ id, session, userAccess }) => {
                       />
                     </div>
                   </div>
-                  <div className="flex items-center gap-4 w-full sm:w-auto">
+                  <div className="flex flex-col sm:flex-row items-center gap-4 w-full sm:w-auto">
                     <select
                       value={projectFilters.status}
                       onChange={(e) => {
                         setProjectFilters(prev => ({ ...prev, status: e.target.value }));
                         fetchProjects(1, { ...projectFilters, status: e.target.value });
                       }}
-                      className="pl-4 pr-8 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                      className="w-full sm:w-auto pl-4 pr-8 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
                     >
                       <option value="all">All Status</option>
                       <option value="pending">Pending</option>
@@ -469,45 +473,49 @@ const SessionDetailsPage = ({ id, session, userAccess }) => {
                     <button
                       onClick={handleExportCSV}
                       disabled={isLoading || projects.length === 0}
-                      className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="w-full sm:w-auto inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       <Download className="h-4 w-4 mr-2" />
                       Export CSV
                     </button>
                   </div>
                 </div>
-                <DataTable
-                  data={projects}
-                  columns={projectColumns}
-                  isLoading={isLoading}
-                  pagination={{
-                    page: projectsPagination.page,
-                    pages: projectsPagination.pages,
-                    total: projectsPagination.total,
-                    onPageChange: (page) => {
-                      setProjectsPage(page);
-                      fetchProjects(page, projectFilters);
-                    },
-                  }}
-                />
+                <div className="overflow-x-auto">
+                  <DataTable
+                    data={projects}
+                    columns={projectColumns}
+                    isLoading={isLoading}
+                    pagination={{
+                      page: projectsPagination.page,
+                      pages: projectsPagination.pages,
+                      total: projectsPagination.total,
+                      onPageChange: (page) => {
+                        setProjectsPage(page);
+                        fetchProjects(page, projectFilters);
+                      },
+                    }}
+                  />
+                </div>
               </div>
             </TabPanel>
 
             <TabPanel>
-              <DataTable
-                data={users}
-                columns={userColumns}
-                isLoading={isLoading}
-                pagination={{
-                  page: usersPagination.page,
-                  pages: usersPagination.pages,
-                  total: usersPagination.total,
-                  onPageChange: (page) => {
-                    setUsersPage(page);
-                    fetchUsers(page);
-                  },
-                }}
-              />
+              <div className="overflow-x-auto">
+                <DataTable
+                  data={users}
+                  columns={userColumns}
+                  isLoading={isLoading}
+                  pagination={{
+                    page: usersPagination.page,
+                    pages: usersPagination.pages,
+                    total: usersPagination.total,
+                    onPageChange: (page) => {
+                      setUsersPage(page);
+                      fetchUsers(page);
+                    },
+                  }}
+                />
+              </div>
             </TabPanel>
           </div>
         </Tabs>

@@ -163,7 +163,7 @@ const SavedSessionPage = ({
           </div>
         ) : (
           // Sessions list
-          <div className="space-y-4 md:grid md:grid-cols-2 gap-2">
+          <div className="space-y-4 md:grid md:grid-cols-2 gap-2 items-start">
             {sessions.map((session) => (
               <SessionCard key={session._id} {...session} />
             ))}
