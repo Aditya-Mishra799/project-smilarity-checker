@@ -66,11 +66,11 @@ export const getSessionDetails = async (sessionId) => {
 export const getSessionProjects = async (
   sessionId,
   page = 1,
-  limit = 10
+  limit = 10,
+  filters = {}
 ) => {
   try {
     const { user } = await getServerSession(authOptions);
-    console.log("Got Req")
     if (!user?.id) {
       throw new ClientError("Unauthorized");
     }
@@ -82,8 +82,23 @@ export const getSessionProjects = async (
     if (!session) {
       throw new ClientError("Session not found");
     }
-    console.log(sessionId)
-    const projects = await Project.find({ sessionId })
+
+    let query = { sessionId };
+
+    // Add search filter
+    if (filters.search) {
+      query.$or = [
+        { title: { $regex: filters.search, $options: 'i' } },
+        { abstract: { $regex: filters.search, $options: 'i' } }
+      ];
+    }
+
+    // Add status filter
+    if (filters.status && filters.status !== 'all') {
+      query.status = filters.status;
+    }
+
+    const projects = await Project.find(query)
       .select('-embedding')
       .populate('creator', 'name email')
       .skip(skip)
@@ -91,18 +106,18 @@ export const getSessionProjects = async (
       .sort({ createdAt: -1 })
       .lean();
 
-    const total = await Project.countDocuments({ sessionId });
-    console.log(projects)
+    const total = await Project.countDocuments(query);
+
     return {
       success: true,
       data: {
         projects: projects.map(project => ({
           ...project,
           _id: project._id.toString(),
-          creator:  project?.creator ? {
+          creator: project?.creator ? {
             ...project.creator,
             _id: project.creator._id.toString()
-          }: {},
+          } : {},
           sessionId: project.sessionId.toString()
         })),
         pagination: {
@@ -120,13 +135,58 @@ export const getSessionProjects = async (
         error: error.message
       };
     }
-    console.error("Error while fetching projects :", error)
+    console.error("Error while fetching projects:", error)
     return {
       success: false,
       error: "Failed to fetch session projects"
     };
   }
 };
+
+export const exportProjectsCSV = async (sessionId) => {
+  try {
+    const { user } = await getServerSession(authOptions);
+    if (!user?.id) {
+      throw new ClientError("Unauthorized");
+    }
+
+    await connectToDB();
+
+    const projects = await Project.find({ 
+      sessionId,
+      creator: { $exists: true, $ne: null }
+    })
+    .populate('creator', 'name email')
+    .select('title abstract status creator createdAt')
+    .lean();
+
+    const csvData = projects.map(project => ({
+      Title: project.title,
+      Abstract: project.abstract,
+      Status: project.status,
+      'Creator Name': project.creator?.name || '',
+      'Creator Email': project.creator?.email || '',
+      'Created At': new Date(project.createdAt).toLocaleDateString(),
+    }));
+
+    return {
+      success: true,
+      data: csvData
+    };
+  } catch (error) {
+    if (error instanceof ClientError) {
+      return {
+        success: false,
+        error: error.message
+      };
+    }
+    return {
+      success: false,
+      error: "Failed to export projects"
+    };
+  }
+};
+
 
 export const getSessionUsers = async (
   sessionId,
