@@ -1,3 +1,4 @@
+import { signOut } from 'next-auth/react';
 import Link from 'next/link';
 import React from 'react';
 
@@ -24,17 +25,18 @@ const ProfileMenu = ({ user }) => {
       {/* Links */}
       <div className="space-y-2 text-sm">
         <Link
-          href="/create-session/new"
+          href="/create-session"
           className="block text-blue-600 hover:text-blue-800 font-medium transition"
         >
           Create Session
         </Link>
-        <Link
+        <button
           href="/logout"
           className="block text-red-500 hover:text-red-700 font-medium transition"
+          onClick={()=>signOut({ callbackUrl: '/', redirect:true })}
         >
           Logout
-        </Link>
+        </button>
       </div>
     </div>
   );

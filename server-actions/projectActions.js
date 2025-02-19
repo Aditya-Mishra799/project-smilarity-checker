@@ -108,6 +108,7 @@ export const updateProjectStatus = async (projectId, newStatus) => {
       message: `Project status updated to ${newStatus}`
     };
   } catch (error) {
+    console.error("Error while changing status",error)
     if (error instanceof ClientError) {
       return {
         success: false,

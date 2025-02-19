@@ -107,7 +107,7 @@ const ProjectDetails = ({ project, userAccess }) => {
                     onClick={() =>
                       setConfirmDialog({
                         isOpen: true,
-                        action: "accept",
+                        action: "accepted",
                       })
                     }
                     className="p-2 text-green-600 hover:bg-green-50 rounded-full"
@@ -119,7 +119,7 @@ const ProjectDetails = ({ project, userAccess }) => {
                     onClick={() =>
                       setConfirmDialog({
                         isOpen: true,
-                        action: "reject",
+                        action: "rejected",
                       })
                     }
                     className="p-2 text-red-600 hover:bg-red-50 rounded-full"
@@ -220,10 +220,10 @@ const ProjectDetails = ({ project, userAccess }) => {
           setConfirmDialog({ isOpen: false, action: null });
         }}
         title={`${
-          confirmDialog.action === "accept" ? "Accept" : "Reject"
+          confirmDialog.action === "accepted" ? "Accept" : "Reject"
         } Project`}
         message={`Are you sure you want to ${confirmDialog.action} this project? This action cannot be undone.`}
-        type={confirmDialog.action === "accept" ? "success" : "danger"}
+        type={confirmDialog.action === "accepted" ? "success" : "danger"}
       />
     </div>
   );
