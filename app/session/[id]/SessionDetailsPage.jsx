@@ -32,7 +32,6 @@ import ConfirmationDialog from "@/components/ConfirmationDialog";
 
 const SessionDetailsPage = ({ id, session, userAccess }) => {
   const { data: sessionData } = useSession();
-  console.log(sessionData)
   const { addToast } = useToast();
   const [activeTab, setActiveTab] = useState(0);
   const [isLoading, setIsLoading] = useState(false);

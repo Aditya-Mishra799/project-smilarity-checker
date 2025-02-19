@@ -39,7 +39,7 @@ const LoginForm = () => {
       const resp = await signIn("credentials", { ...data, callbackUrl });
       methods.reset();
     } catch (error) {
-      console.log("Error during login:", error);
+      console.error("Error during login:", error);
     }
   };
   return (
