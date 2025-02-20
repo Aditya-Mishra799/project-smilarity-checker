@@ -56,7 +56,19 @@ const CreateOrUpadateProject = ({
     try {
       let response;
       if (projectId) {
-        response = await updateSession(projectId, data);
+        const body = {
+          ...data,
+          project_id: projectId,
+        };
+        response  = await axios.put(
+          `${apiUrl}/update_project`,
+          body,
+          {
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
       } else {
         const body = {
           ...data,
