@@ -1,3 +1,4 @@
+import { User } from 'lucide-react';
 import { signOut } from 'next-auth/react';
 import Link from 'next/link';
 import React from 'react';
@@ -11,11 +12,11 @@ const ProfileMenu = ({ user }) => {
     <div className="p-4 bg-white shadow-lg rounded-md w-64">
       {/* User Info */}
       <Link className="flex items-center gap-3 mb-4" href={"/profile"}>
-        <img
+      {user?.image ? <img
           src={user?.image}
           alt="User Avatar"
           className="w-12 h-12 rounded-full border-2 border-blue-500"
-        />
+        />:  <User className=" text-gray-400 rounded-full border-2 border-blue-500" size = {36} />}
         <div>
           <p className="text-gray-800 font-semibold text-base">{user.name}</p>
           <p className="text-gray-500 text-xs tracking-wide">{user.email}</p>
