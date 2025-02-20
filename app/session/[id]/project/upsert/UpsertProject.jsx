@@ -35,7 +35,7 @@ const inputForm = [
   },
 ];
 
-const CreateOrUpadateProject = ({
+const UpsertProject = ({
   id,
   projectId: initialProjectId,
   user,
@@ -131,4 +131,4 @@ const CreateOrUpadateProject = ({
   );
 };
 
-export default CreateOrUpadateProject;
+export default UpsertProject;

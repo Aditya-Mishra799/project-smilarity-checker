@@ -12,17 +12,23 @@ const page = async ({ searchParams }) => {
     if (!response.success) {
       return notFound();
     }
-    const { name, description, threshold, autoReject } = response.data;
+    const { name, description, threshold, autoReject, status } = response.data;
+    console.log(status)
     defaultValue = {
       name,
       description,
       threshold,
       autoReject,
+      status,
     };
   }
   return (
     <div>
-      <AttachSessionDetails id={id} Component={UpsertSession} defaultValue = {defaultValue}/>
+      <AttachSessionDetails
+        id={id}
+        Component={UpsertSession}
+        defaultValue={defaultValue}
+      />
     </div>
   );
 };

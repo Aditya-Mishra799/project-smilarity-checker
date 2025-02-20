@@ -287,7 +287,7 @@ const SessionDetailsPage = ({ id, session, userAccess }) => {
                 className={`text-gray-600 mt-1 ${
                   expandDesciption ? "" : "line-clamp-3"
                 } hover:line-clamp-none`}
-                onClick = {()=>setExpandDescirption(prev => !prev)}
+                onClick={() => setExpandDescirption((prev) => !prev)}
               >
                 {session.description}
               </p>
@@ -302,12 +302,14 @@ const SessionDetailsPage = ({ id, session, userAccess }) => {
                   Bulk Upload
                 </Link>
               )}
-              <Link
-                href={`/session/${id}/project/upsert`}
-                className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-indigo-700 bg-indigo-100 hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 w-full md:w-auto justify-center"
-              >
-                Add Project
-              </Link>
+              {session.status === "active" && (
+                <Link
+                  href={`/session/${id}/project/upsert`}
+                  className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-indigo-700 bg-indigo-100 hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 w-full md:w-auto justify-center"
+                >
+                  Add Project
+                </Link>
+              )}
               {userAccess.isCreator && (
                 <Link
                   href={`/session/upsert?id=${id}`}

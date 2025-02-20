@@ -2,7 +2,7 @@ import AttachSessionDetails from "@/components/AttachSessionDetails";
 import { getProjectDetails } from "@/server-actions/projectActions";
 import { notFound } from "next/navigation";
 import React from "react";
-import CreateOrUpadateProject from "./CreateOrUpadateProject";
+import UpsertProject from "./UpsertProject";
 
 const page = async ({ params, searchParams }) => {
   const projectId = (await searchParams).projectId;
@@ -27,7 +27,7 @@ const page = async ({ params, searchParams }) => {
       <AttachSessionDetails
         id={id}
         projectId={projectId}
-        Component={CreateOrUpadateProject}
+        Component={UpsertProject}
         defaultValues={defaultValues}
       />
     </div>

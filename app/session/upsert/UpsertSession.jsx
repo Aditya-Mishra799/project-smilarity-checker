@@ -15,6 +15,7 @@ import sessionFormSchema from "@/FormValidationSchema/sessionFormSchema";
 import { createSession, updateSession } from "@/server-actions/sessionAction";
 import useApiHandler from "@/hooks/useApiHandler";
 import SuccessMessage from "@/components/SuccessMessage";
+import SearchableSelect from "@/components/SearchableSelect";
 
 const inputForm = [
   {
@@ -38,9 +39,15 @@ const inputForm = [
   {
     name: "autoReject",
     label: "Auto Reject",
-    type: "password",
     component: Switch,
     defaultValue: true,
+  },
+  {
+    name: "status",
+    label: "Status",
+    component: SearchableSelect,
+    options: ['active', 'inactive', 'closed'],
+    defaultValue: "active",
   },
   {
     name: "threshold",
@@ -48,6 +55,7 @@ const inputForm = [
     type: "number",
     component: PercentageInput,
     defaultValue: 60,
+    fullWidth : true,
   },
 ];
 
@@ -55,6 +63,7 @@ const UpsertSession = ({ id, user, defaultValue }) => {
   const { addToast } = useToast();
   const [isSubmitted, setSubmitted] = useState(false);
   const [sessionId, setSessionId] = useState(id);
+  // console.log(defaultValue)
   const methods = useForm({
     resolver: zodResolver(sessionFormSchema),
     mode: "onBlur",
@@ -63,10 +72,11 @@ const UpsertSession = ({ id, user, defaultValue }) => {
   const createOrUpdateSession = useApiHandler(async (data) => {
     try {
       let response;
+      console.log(data)
       if (id) {
         response = await updateSession(id, data);
       } else {
-        response = await createSession(data);
+        response = await createSession( data );
       }
       if (response.success) {
         setSubmitted(true);

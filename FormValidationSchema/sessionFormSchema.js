@@ -9,6 +9,7 @@ const sessionFormSchema = z.object({
     .min(0, { message: "Threshold must be at least 0%" })
     .max(100, { message: "Threshold cannot exceed 100%" })
     .default(0),
+    status: z.enum(['active', 'inactive', 'closed']),
 });
 
 export default sessionFormSchema;

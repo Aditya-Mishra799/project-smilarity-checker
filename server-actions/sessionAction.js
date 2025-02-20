@@ -12,6 +12,7 @@ export const createSession = async ({
   autoReject,
   projectIds,
   coAdmins,
+  status,
 }) => {
   try {
     const { user } = await getServerSession(authOptions);
@@ -28,7 +29,7 @@ export const createSession = async ({
       creator: user.id,
       projectIds: projectIds || [],
       coAdmins: coAdmins || [],
-      status: "active",
+      status,
     });
     await session.save();
     return {
@@ -76,8 +77,12 @@ export const updateSession = async (sessionId, updates) => {
       throw new ClientError("You are not authorized to update this session.");
     }
 
-    Object.assign(session, updates);
-    await session.save();
+    const filteredUpdates = Object.fromEntries(
+      Object.entries(updates).filter(([_, value]) => value !== undefined)
+    );
+    console.log(filteredUpdates)
+
+    await Session.updateOne({ _id: sessionId }, { $set: filteredUpdates });
 
     return {
       success: true,
@@ -157,11 +162,7 @@ export const getSessionById = async (sessionId) => {
   }
 };
 
-export const getAllSessions = async (
-  page = 1,
-  limit = 10,
-  filters = {}
-) => {
+export const getAllSessions = async (page = 1, limit = 10, filters = {}) => {
   try {
     const { user } = await getServerSession(authOptions);
     if (!user || !user.id) {
@@ -173,29 +174,26 @@ export const getAllSessions = async (
 
     // Build query based on filters
     const query = {};
-    
+
     if (filters.search) {
       query.$or = [
-        { name: { $regex: filters.search, $options: 'i' } },
-        { description: { $regex: filters.search, $options: 'i' } }
+        { name: { $regex: filters.search, $options: "i" } },
+        { description: { $regex: filters.search, $options: "i" } },
       ];
     }
-    
-    if (filters.status && filters.status !== 'all') {
+
+    if (filters.status && filters.status !== "all") {
       query.status = filters.status;
     }
 
-    const sessions = await Session.find(
-      query,
-      {
-        creator: 1,
-        name: 1,
-        description: 1,
-        threshold: 1,
-        status: 1,
-        createdAt: 1,
-      }
-    )
+    const sessions = await Session.find(query, {
+      creator: 1,
+      name: 1,
+      description: 1,
+      threshold: 1,
+      status: 1,
+      createdAt: 1,
+    })
       .skip(skip)
       .limit(limit)
       .sort({ createdAt: -1 });
@@ -224,7 +222,8 @@ export const getAllSessions = async (
     if (error instanceof ClientError) {
       return {
         success: false,
-        message: error.message || "Some error occurred while fetching sessions.",
+        message:
+          error.message || "Some error occurred while fetching sessions.",
         error: error.message,
         data: {
           sessions: [],
@@ -238,7 +237,8 @@ export const getAllSessions = async (
       console.error(error);
       return {
         success: false,
-        message: "An unexpected error occurred while fetching sessions. Please try again later.",
+        message:
+          "An unexpected error occurred while fetching sessions. Please try again later.",
         error: null,
         data: {
           sessions: [],
