@@ -48,6 +48,7 @@ const SessionDetailsPage = ({ id, session, userAccess }) => {
   const [usersPage, setUsersPage] = useState(1);
   const [projects, setProjects] = useState([]);
   const [users, setUsers] = useState([]);
+  const [expandDesciption, setExpandDescirption] = useState(false);
   const [projectsPagination, setProjectsPagination] = useState({
     total: 0,
     pages: 1,
@@ -282,7 +283,14 @@ const SessionDetailsPage = ({ id, session, userAccess }) => {
               <h1 className="text-2xl font-bold text-gray-900">
                 {session.name}
               </h1>
-              <p className="text-gray-600 mt-1">{session.description}</p>
+              <p
+                className={`text-gray-600 mt-1 ${
+                  expandDesciption ? "" : "line-clamp-3"
+                } hover:line-clamp-none`}
+                onClick = {()=>setExpandDescirption(prev => !prev)}
+              >
+                {session.description}
+              </p>
             </div>
             <div className="flex flex-wrap items-center gap-4 w-full md:w-auto">
               {userAccess.hasAdminAccess && (
@@ -302,7 +310,7 @@ const SessionDetailsPage = ({ id, session, userAccess }) => {
               </Link>
               {userAccess.isCreator && (
                 <Link
-                  href={`/create-session?id=${id}`}
+                  href={`/session/upsert?id=${id}`}
                   className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-gray-700 bg-gray-100 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 w-full md:w-auto justify-center"
                 >
                   <Edit className="h-4 w-4 mr-2" />
@@ -331,6 +339,26 @@ const SessionDetailsPage = ({ id, session, userAccess }) => {
               </div>
               <div className="mt-1 text-lg font-semibold text-gray-900">
                 {session.creator.name}
+              </div>
+            </div>
+            <div className="bg-gray-50 rounded-lg p-4">
+              <div className="text-sm font-medium text-gray-500">
+                Auto Reject
+              </div>
+              <div className="mt-1 text-lg font-semibold text-gray-900">
+                {session.autoReject ? "On" : "Off"}
+              </div>
+            </div>
+            <div className="bg-gray-50 rounded-lg p-4">
+              <div className="text-sm font-medium text-gray-500">
+                Created On
+              </div>
+              <div className="mt-1 text-lg font-semibold text-gray-900">
+                {new Date(session.createdAt).toLocaleDateString("en-US", {
+                  year: "numeric",
+                  month: "long",
+                  day: "numeric",
+                })}
               </div>
             </div>
           </div>
@@ -382,17 +410,18 @@ const SessionDetailsPage = ({ id, session, userAccess }) => {
               <div className="space-y-6">
                 <div>
                   <div className="flex justify-between items-center mb-4">
-                  <h3 className="text-lg font-medium text-gray-900 ">
-                    Co-Adminis
-                  </h3>
-                  {
-                    userAccess.isCreator && (
-                      <Button onClick={()=>setIsAddCoAdminDialogOpen(true)} className = {"text-xs flex gap-2"}>
+                    <h3 className="text-lg font-medium text-gray-900 ">
+                      Co-Adminis
+                    </h3>
+                    {userAccess.isCreator && (
+                      <Button
+                        onClick={() => setIsAddCoAdminDialogOpen(true)}
+                        className={"text-xs flex gap-2"}
+                      >
                         Add Co-Admin
-                        <UserPlus  className="text-xs" size = {14}/>
+                        <UserPlus className="text-xs" size={14} />
                       </Button>
-                    )
-                  }
+                    )}
                   </div>
                   <div className="bg-white rounded-lg shadow overflow-hidden">
                     <div className="overflow-x-auto">

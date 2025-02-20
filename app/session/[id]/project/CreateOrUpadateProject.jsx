@@ -35,14 +35,21 @@ const inputForm = [
   },
 ];
 
-const CreateOrUpadateProject = ({ id, projectId, user }) => {
+const CreateOrUpadateProject = ({
+  id,
+  projectId: initialProjectId,
+  user,
+  defaultValues,
+}) => {
   const router = useRouter();
   const { addToast } = useToast();
   const [isSubmitted, setSubmitted] = useState(false);
+  const [projectId, setProjectId] = useState(initialProjectId);
 
   const methods = useForm({
     resolver: zodResolver(projectFormSchema),
     mode: "onBlur",
+    defaultValues: defaultValues,
   });
   const createOrUpdateSession = useApiHandler(async (data) => {
     const apiUrl = process.env.NEXT_PUBLIC_SIMILARITY_API_ENDPOINT_BASE_URL;
@@ -51,17 +58,21 @@ const CreateOrUpadateProject = ({ id, projectId, user }) => {
       if (projectId) {
         response = await updateSession(projectId, data);
       } else {
-        const body =  {
+        const body = {
           ...data,
           session_id: id,
           creator_id: user.id,
-        }
-        response = await axios.post(`${apiUrl}/add_project`,body, {
-          headers : {
-            "Content-Type": 'application/json',
-          }
+        };
+        response = await axios.post(`${apiUrl}/add_project`, body, {
+          headers: {
+            "Content-Type": "application/json",
+          },
         });
+        if (!projectId) {
+          setProjectId(response.data.projectId);
+        }
       }
+      setSubmitted(true);
       addToast("info", response.message || "Form Submitted Successfully");
     } catch (error) {
       console.error(error);
@@ -75,7 +86,13 @@ const CreateOrUpadateProject = ({ id, projectId, user }) => {
     await createOrUpdateSession.execute(data);
   };
   if (isSubmitted) {
-    return <SuccessMessage message={"Submitted form sucessfully."} />;
+    return (
+      <SuccessMessage
+        message={"Submitted form sucessfully."}
+        link={`/session/${id}/project/${projectId}`}
+        label={"Got to Project"}
+      />
+    );
   }
 
   return (

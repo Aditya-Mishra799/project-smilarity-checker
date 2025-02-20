@@ -17,7 +17,7 @@ const ProfileMenu = ({ user }) => {
           className="w-12 h-12 rounded-full border-2 border-blue-500"
         />
         <div>
-          <p className="text-gray-800 font-semibold text-lg">{user.name}</p>
+          <p className="text-gray-800 font-semibold text-base">{user.name}</p>
           <p className="text-gray-500 text-xs tracking-wide">{user.email}</p>
         </div>
       </Link>
@@ -25,7 +25,7 @@ const ProfileMenu = ({ user }) => {
       {/* Links */}
       <div className="space-y-2 text-sm">
         <Link
-          href="/create-session"
+          href="/session/upsert"
           className="block text-blue-600 hover:text-blue-800 font-medium transition"
         >
           Create Session

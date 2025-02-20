@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Step from "@/components/form/Step";
 import Input from "@/components/Input";
 import TextArea from "@/components/TextArea";
@@ -51,14 +51,14 @@ const inputForm = [
   },
 ];
 
-const CreateListingForm = ({ id, user }) => {
-  const router = useRouter();
+const UpsertSession = ({ id, user, defaultValue }) => {
   const { addToast } = useToast();
   const [isSubmitted, setSubmitted] = useState(false);
-
+  const [sessionId, setSessionId] = useState(id);
   const methods = useForm({
     resolver: zodResolver(sessionFormSchema),
     mode: "onBlur",
+    defaultValues: defaultValue,
   });
   const createOrUpdateSession = useApiHandler(async (data) => {
     try {
@@ -70,6 +70,9 @@ const CreateListingForm = ({ id, user }) => {
       }
       if (response.success) {
         setSubmitted(true);
+        if (!sessionId) {
+          setSessionId(response.data.sessionId);
+        }
         addToast("info", response.message || "Form Submitted Successfully");
         methods.reset();
       } else {
@@ -79,7 +82,7 @@ const CreateListingForm = ({ id, user }) => {
         );
       }
     } catch (error) {
-      console.error(error)
+      console.error(error);
       addToast(
         "error",
         error.message || "Some error occurred while processing the session."
@@ -90,7 +93,13 @@ const CreateListingForm = ({ id, user }) => {
     await createOrUpdateSession.execute(data);
   };
   if (isSubmitted) {
-    return <SuccessMessage message={"Submitted form sucessfully."} />;
+    return (
+      <SuccessMessage
+        message={"Submitted form sucessfully."}
+        link={`/session/${sessionId}`}
+        label={"Go to Session"}
+      />
+    );
   }
 
   return (
@@ -117,4 +126,4 @@ const CreateListingForm = ({ id, user }) => {
   );
 };
 
-export default CreateListingForm;
+export default UpsertSession;
