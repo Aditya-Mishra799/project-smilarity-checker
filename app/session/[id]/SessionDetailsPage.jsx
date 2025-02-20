@@ -303,7 +303,7 @@ const SessionDetailsPage = ({ id, session, userAccess }) => {
                 </Link>
               )}
               <Link
-                href={`/session/${id}/project`}
+                href={`/session/${id}/project/upsert`}
                 className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-indigo-700 bg-indigo-100 hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 w-full md:w-auto justify-center"
               >
                 Add Project
@@ -411,7 +411,7 @@ const SessionDetailsPage = ({ id, session, userAccess }) => {
                 <div>
                   <div className="flex justify-between items-center mb-4">
                     <h3 className="text-lg font-medium text-gray-900 ">
-                      Co-Adminis
+                      Co-Admins
                     </h3>
                     {userAccess.isCreator && (
                       <Button
