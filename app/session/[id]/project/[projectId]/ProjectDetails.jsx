@@ -132,7 +132,7 @@ const ProjectDetails = ({ project, userAccess }) => {
 
               {userAccess.canEdit && (
                 <Link
-                  href={`/session/${project.sessionId}/project?projectId=${project._id}`}
+                  href={`/session/${project.sessionId}/project/upsert?projectId=${project._id}`}
                   className="p-2 text-blue-600 hover:bg-blue-50 rounded-full"
                 >
                   <Edit2 size={20} />

@@ -1,19 +1,21 @@
-'use client';
-import React, { useCallback, useState } from 'react';
-import { useDropzone } from 'react-dropzone';
-import { Upload, FileText, X, Loader2 } from 'lucide-react';
-import { useToast } from '@/components/toast/ToastProvider';
-import axios from 'axios';
+"use client";
+import React, { useCallback, useState } from "react";
+import { useDropzone } from "react-dropzone";
+import { Upload, FileText, X, Loader2 } from "lucide-react";
+import { useToast } from "@/components/toast/ToastProvider";
+import axios from "axios";
+import SuccessMessage from "@/components/SuccessMessage";
 
 const BulkUploadForm = ({ id, user }) => {
   const [file, setFile] = useState(null);
   const [uploading, setUploading] = useState(false);
   const { addToast } = useToast();
+  const [isSubmitted, setSubmitted] = useState(false);
 
   const onDrop = useCallback((acceptedFiles) => {
     const selectedFile = acceptedFiles[0];
-    if (selectedFile?.type !== 'text/csv') {
-      addToast('error', 'Please upload a CSV file');
+    if (selectedFile?.type !== "text/csv") {
+      addToast("error", "Please upload a CSV file");
       return;
     }
     setFile(selectedFile);
@@ -22,21 +24,21 @@ const BulkUploadForm = ({ id, user }) => {
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
     accept: {
-      'text/csv': ['.csv'],
+      "text/csv": [".csv"],
     },
     maxFiles: 1,
   });
 
   const handleUpload = async () => {
     if (!file) {
-      addToast('error', 'Please select a file to upload');
+      addToast("error", "Please select a file to upload");
       return;
     }
 
     setUploading(true);
     const formData = new FormData();
-    formData.append('session_id', id);
-    formData.append('file', file);
+    formData.append("session_id", id);
+    formData.append("file", file);
 
     try {
       const apiUrl = process.env.NEXT_PUBLIC_SIMILARITY_API_ENDPOINT_BASE_URL;
@@ -45,22 +47,31 @@ const BulkUploadForm = ({ id, user }) => {
         formData,
         {
           headers: {
-            'Content-Type': 'multipart/form-data',
+            "Content-Type": "multipart/form-data",
           },
         }
       );
-      addToast('success', 'Upload completed successfully');
+      addToast("success", "Upload completed successfully");
       setFile(null);
+      setSubmitted(true);
     } catch (error) {
       addToast(
-        'error',
-        error.response?.data?.message || 'Error uploading file'
+        "error",
+        error.response?.data?.message || "Error uploading file"
       );
     } finally {
       setUploading(false);
     }
   };
-
+  if (isSubmitted) {
+    return (
+      <SuccessMessage
+        message={"Submitted form sucessfully."}
+        link={`/session/${id}`}
+        label={"Got back to Session"}
+      />
+    );
+  }
   return (
     <div className="max-w-2xl mx-auto p-6">
       <div className="mb-8">
@@ -68,7 +79,8 @@ const BulkUploadForm = ({ id, user }) => {
           Bulk Upload Projects
         </h1>
         <p className="text-gray-600">
-          Upload a CSV file containing multiple projects to add them to this session.
+          Upload a CSV file containing multiple projects to add them to this
+          session.
         </p>
       </div>
 
@@ -77,15 +89,15 @@ const BulkUploadForm = ({ id, user }) => {
         className={`border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition-colors
           ${
             isDragActive
-              ? 'border-indigo-500 bg-indigo-50'
-              : 'border-gray-300 hover:border-gray-400'
+              ? "border-indigo-500 bg-indigo-50"
+              : "border-gray-300 hover:border-gray-400"
           }`}
       >
         <input {...getInputProps()} />
         <div className="flex flex-col items-center space-y-4">
           <Upload
             className={`w-12 h-12 ${
-              isDragActive ? 'text-indigo-500' : 'text-gray-400'
+              isDragActive ? "text-indigo-500" : "text-gray-400"
             }`}
           />
           {isDragActive ? (
@@ -125,8 +137,8 @@ const BulkUploadForm = ({ id, user }) => {
         className={`mt-6 w-full py-2 px-4 rounded-md text-white font-medium
           ${
             !file || uploading
-              ? 'bg-gray-300 cursor-not-allowed'
-              : 'bg-indigo-600 hover:bg-indigo-700'
+              ? "bg-gray-300 cursor-not-allowed"
+              : "bg-indigo-600 hover:bg-indigo-700"
           }
           flex items-center justify-center space-x-2`}
       >

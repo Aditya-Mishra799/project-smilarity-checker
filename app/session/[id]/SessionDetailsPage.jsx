@@ -29,7 +29,7 @@ import {
 import SessionDetailsSkeleton from "./SessionDetailsSkeleton";
 import Link from "next/link";
 import ConfirmationDialog from "@/components/ConfirmationDialog";
-import AddCoAdminModal from "./project/AddCoAdminModal";
+import AddCoAdminModal from "./AddCoAdminModal";
 import Button from "@/components/Button";
 
 const SessionDetailsPage = ({ id, session, userAccess }) => {
@@ -203,7 +203,7 @@ const SessionDetailsPage = ({ id, session, userAccess }) => {
         <div className="flex items-center gap-2">
           {(userAccess.hasAdminAccess || userAccess.isCreator) && (
             <Link
-              href={`/session/${session._id}/project/${row.original._id}`}
+              href={`/session/${session._id}/project/upsert?projectId=${row.original._id}`}
               className="p-1 hover:bg-blue-50 rounded-full text-blue-600"
             >
               <Edit size={16} />
