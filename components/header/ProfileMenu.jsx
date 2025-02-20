@@ -10,7 +10,7 @@ const ProfileMenu = ({ user }) => {
   return (
     <div className="p-4 bg-white shadow-lg rounded-md w-64">
       {/* User Info */}
-      <div className="flex items-center gap-3 mb-4">
+      <Link className="flex items-center gap-3 mb-4" href={"/profilegit "}>
         <img
           src={user?.image}
           alt="User Avatar"
@@ -20,7 +20,7 @@ const ProfileMenu = ({ user }) => {
           <p className="text-gray-800 font-semibold text-lg">{user.name}</p>
           <p className="text-gray-500 text-xs tracking-wide">{user.email}</p>
         </div>
-      </div>
+      </Link>
 
       {/* Links */}
       <div className="space-y-2 text-sm">
