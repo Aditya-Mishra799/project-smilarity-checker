@@ -29,12 +29,15 @@ import {
 import SessionDetailsSkeleton from "./SessionDetailsSkeleton";
 import Link from "next/link";
 import ConfirmationDialog from "@/components/ConfirmationDialog";
+import AddCoAdminModal from "./project/AddCoAdminModal";
+import Button from "@/components/Button";
 
 const SessionDetailsPage = ({ id, session, userAccess }) => {
   const { data: sessionData } = useSession();
   const { addToast } = useToast();
   const [activeTab, setActiveTab] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
+
   const [confirmDialog, setConfirmDialog] = useState({
     isOpen: false,
     type: null,
@@ -50,6 +53,7 @@ const SessionDetailsPage = ({ id, session, userAccess }) => {
     pages: 1,
     page: 1,
   });
+  const [isAddCoAdminDialogOpen, setIsAddCoAdminDialogOpen] = useState(false);
   const [usersPagination, setUsersPagination] = useState({
     total: 0,
     pages: 1,
@@ -129,15 +133,17 @@ const SessionDetailsPage = ({ id, session, userAccess }) => {
         // Convert to CSV
         const csvContent = [
           Object.keys(response.data[0]).join(","),
-          ...response.data.map(row => 
-            Object.values(row).map(value => 
-              `"${String(value).replace(/"/g, '""')}"`
-            ).join(",")
-          )
+          ...response.data.map((row) =>
+            Object.values(row)
+              .map((value) => `"${String(value).replace(/"/g, '""')}"`)
+              .join(",")
+          ),
         ].join("\n");
 
         // Create and download file
-        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const blob = new Blob([csvContent], {
+          type: "text/csv;charset=utf-8;",
+        });
         const link = document.createElement("a");
         const url = URL.createObjectURL(blob);
         link.setAttribute("href", url);
@@ -194,21 +200,23 @@ const SessionDetailsPage = ({ id, session, userAccess }) => {
       header: "Actions",
       cell: ({ row }) => (
         <div className="flex items-center gap-2">
-          {
-          (userAccess.hasAdminAccess || userAccess.isCreator)  && (<Link
-            href={`/session/${session._id}/project/${row.original._id}`}
-            className="p-1 hover:bg-blue-50 rounded-full text-blue-600"
-          >
-            <Edit size={16} />
-          </Link>)
-          }
+          {(userAccess.hasAdminAccess || userAccess.isCreator) && (
+            <Link
+              href={`/session/${session._id}/project/${row.original._id}`}
+              className="p-1 hover:bg-blue-50 rounded-full text-blue-600"
+            >
+              <Edit size={16} />
+            </Link>
+          )}
           {userAccess.hasAdminAccess && (
             <button
-              onClick={() => setConfirmDialog({
-                isOpen: true,
-                type: 'removeProject',
-                data: row.original._id
-              })}
+              onClick={() =>
+                setConfirmDialog({
+                  isOpen: true,
+                  type: "removeProject",
+                  data: row.original._id,
+                })
+              }
               className="p-1 hover:bg-red-50 rounded-full text-red-600"
             >
               <Trash size={16} />
@@ -237,11 +245,13 @@ const SessionDetailsPage = ({ id, session, userAccess }) => {
               (admin) => admin._id === row.original._id
             ) ? (
               <button
-                onClick={() => setConfirmDialog({
-                  isOpen: true,
-                  type: 'removeCoAdmin',
-                  data: row.original._id
-                })}
+                onClick={() =>
+                  setConfirmDialog({
+                    isOpen: true,
+                    type: "removeCoAdmin",
+                    data: row.original._id,
+                  })
+                }
                 className="p-1 hover:bg-red-50 rounded-full text-red-600"
               >
                 <UserMinus size={16} />
@@ -316,7 +326,9 @@ const SessionDetailsPage = ({ id, session, userAccess }) => {
               </div>
             </div>
             <div className="bg-gray-50 rounded-lg p-4">
-              <div className="text-sm font-medium text-gray-500">Created By</div>
+              <div className="text-sm font-medium text-gray-500">
+                Created By
+              </div>
               <div className="mt-1 text-lg font-semibold text-gray-900">
                 {session.creator.name}
               </div>
@@ -369,9 +381,19 @@ const SessionDetailsPage = ({ id, session, userAccess }) => {
             <TabPanel>
               <div className="space-y-6">
                 <div>
-                  <h3 className="text-lg font-medium text-gray-900 mb-4">
-                    Co-Administrators
+                  <div className="flex justify-between items-center mb-4">
+                  <h3 className="text-lg font-medium text-gray-900 ">
+                    Co-Adminis
                   </h3>
+                  {
+                    userAccess.isCreator && (
+                      <Button onClick={()=>setIsAddCoAdminDialogOpen(true)} className = {"text-xs flex gap-2"}>
+                        Add Co-Admin
+                        <UserPlus  className="text-xs" size = {14}/>
+                      </Button>
+                    )
+                  }
+                  </div>
                   <div className="bg-white rounded-lg shadow overflow-hidden">
                     <div className="overflow-x-auto">
                       <table className="min-w-full divide-y divide-gray-200">
@@ -406,11 +428,13 @@ const SessionDetailsPage = ({ id, session, userAccess }) => {
                               {userAccess.isCreator && (
                                 <td className="px-6 py-4 whitespace-nowrap text-right">
                                   <button
-                                    onClick={() => setConfirmDialog({
-                                      isOpen: true,
-                                      type: 'removeCoAdmin',
-                                      data: admin._id
-                                    })}
+                                    onClick={() =>
+                                      setConfirmDialog({
+                                        isOpen: true,
+                                        type: "removeCoAdmin",
+                                        data: admin._id,
+                                      })
+                                    }
                                     className="text-red-600 hover:text-red-900"
                                   >
                                     <UserMinus size={20} />
@@ -442,14 +466,23 @@ const SessionDetailsPage = ({ id, session, userAccess }) => {
                 <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4">
                   <div className="flex-1 w-full sm:w-auto">
                     <div className="relative">
-                      <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
+                      <Search
+                        className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+                        size={20}
+                      />
                       <input
                         type="text"
                         placeholder="Search projects..."
                         value={projectFilters.search}
                         onChange={(e) => {
-                          setProjectFilters(prev => ({ ...prev, search: e.target.value }));
-                          fetchProjects(1, { ...projectFilters, search: e.target.value });
+                          setProjectFilters((prev) => ({
+                            ...prev,
+                            search: e.target.value,
+                          }));
+                          fetchProjects(1, {
+                            ...projectFilters,
+                            search: e.target.value,
+                          });
                         }}
                         className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
                       />
@@ -459,8 +492,14 @@ const SessionDetailsPage = ({ id, session, userAccess }) => {
                     <select
                       value={projectFilters.status}
                       onChange={(e) => {
-                        setProjectFilters(prev => ({ ...prev, status: e.target.value }));
-                        fetchProjects(1, { ...projectFilters, status: e.target.value });
+                        setProjectFilters((prev) => ({
+                          ...prev,
+                          status: e.target.value,
+                        }));
+                        fetchProjects(1, {
+                          ...projectFilters,
+                          status: e.target.value,
+                        });
                       }}
                       className="w-full sm:w-auto pl-4 pr-8 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
                     >
@@ -523,25 +562,32 @@ const SessionDetailsPage = ({ id, session, userAccess }) => {
       {/* Confirmation Dialogs */}
       <ConfirmationDialog
         isOpen={confirmDialog.isOpen}
-        onClose={() => setConfirmDialog({ isOpen: false, type: null, data: null })}
+        onClose={() =>
+          setConfirmDialog({ isOpen: false, type: null, data: null })
+        }
         onConfirm={() => {
-          if (confirmDialog.type === 'removeProject') {
+          if (confirmDialog.type === "removeProject") {
             handleRemoveProject(confirmDialog.data);
-          } else if (confirmDialog.type === 'removeCoAdmin') {
-            handleCoAdminUpdate(confirmDialog.data, 'remove');
+          } else if (confirmDialog.type === "removeCoAdmin") {
+            handleCoAdminUpdate(confirmDialog.data, "remove");
           }
         }}
         title={
-          confirmDialog.type === 'removeProject'
+          confirmDialog.type === "removeProject"
             ? "Remove Project"
             : "Remove Co-Admin"
         }
         message={
-          confirmDialog.type === 'removeProject'
+          confirmDialog.type === "removeProject"
             ? "Are you sure you want to remove this project? This action cannot be undone."
             : "Are you sure you want to remove this co-administrator? They will lose administrative access to this session."
         }
         type="danger"
+      />
+      <AddCoAdminModal
+        isOpen={isAddCoAdminDialogOpen}
+        onClose={() => setIsAddCoAdminDialogOpen(false)}
+        sessionId={id}
       />
     </div>
   );

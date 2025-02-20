@@ -6,6 +6,7 @@ import { ClientError } from "./clientError";
 import Session from "@/models/session";
 import Project from "@/models/project";
 import User from "@/models/user";
+import { escapeRegExp } from "@/utils/basicUtils";
 
 export const getSessionDetails = async (sessionId) => {
   try {
@@ -340,6 +341,122 @@ export const removeProject = async (projectId, sessionId) => {
     return {
       success: false,
       error: "Failed to remove project",
+    };
+  }
+};
+
+export const addBulkCoAdmins = async (sessionId, userIds) => {
+  try {
+    const { user } = await getServerSession(authOptions);
+    if (!user?.id) {
+      throw new ClientError("Unauthorized");
+    }
+
+    await connectToDB();
+
+    const session = await Session.findById(sessionId);
+    if (!session) {
+      throw new ClientError("Session not found");
+    }
+
+    if (session.creator.toString() !== user.id) {
+      throw new ClientError("Only the session creator can manage co-admins");
+    }
+
+    // Filter out any userIds that are already co-admins
+    const newCoAdmins = userIds.filter(
+      (userId) => !session.coAdmins.includes(userId)
+    );
+
+    if (newCoAdmins.length === 0) {
+      return {
+        success: true,
+        message: "No new co-admins to add",
+      };
+    }
+
+    // Add new co-admins
+    session.coAdmins.push(...newCoAdmins);
+    await session.save();
+
+    return {
+      success: true,
+      message: `Successfully added ${newCoAdmins.length} co-admin${
+        newCoAdmins.length > 1 ? "s" : ""
+      }`,
+    };
+  } catch (error) {
+    if (error instanceof ClientError) {
+      return {
+        success: false,
+        error: error.message,
+      };
+    }
+    return {
+      success: false,
+      error: "Failed to add co-admins",
+    };
+  }
+};
+
+export const getUsersNotInSession = async (
+  sessionId,
+  searchQuery,
+  page,
+  limit
+) => {
+  try {
+    const userSession = await getServerSession(authOptions);
+    if (!userSession?.user) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+    await connectToDB();
+    const skip = (page - 1) * limit;
+    const session = await Session.findById(sessionId).select("coAdmins").lean();
+    if (!session) {
+      return { success: false, error: "Session not found" };
+    }
+
+    const coAdminIds = session.coAdmins.map((id) => id.toString()); // Convert ObjectIds to strings
+
+    const query = {
+      _id: { $nin: coAdminIds },
+      isVerified: true,
+      $or: [
+        { name: { $regex: escapeRegExp(searchQuery), $options: "i" } },
+        { email: { $regex: escapeRegExp(searchQuery), $options: "i" } },
+      ],
+    };
+
+    const users = await User.find(query)
+      .select("name email")
+      .skip(skip)
+      .limit(limit)
+      .lean();
+    const totalUsers = await User.countDocuments(query);
+    const totalPages = Math.ceil(totalUsers / limit);
+    const hasNextPage = page < totalPages;
+    const hasPrevPage = page > 1;
+
+    return {
+      success: true,
+      message: `sucessfully found the users`,
+      data: {
+        users: users.map((user) => ({ ...user, _id: user._id.toString() })),
+        pagination: {
+          totalUsers,
+          currentPage: page,
+          totalPages,
+          hasNextPage,
+          hasPrevPage,
+        },
+      },
+    };
+  } catch (error) {
+    console.error("Error searching users:", error);
+    return {
+      success: false,
+      error: "Failed fetch user data",
     };
   }
 };
