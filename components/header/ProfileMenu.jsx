@@ -10,7 +10,7 @@ const ProfileMenu = ({ user }) => {
   return (
     <div className="p-4 bg-white shadow-lg rounded-md w-64">
       {/* User Info */}
-      <Link className="flex items-center gap-3 mb-4" href={"/profilegit "}>
+      <Link className="flex items-center gap-3 mb-4" href={"/profile"}>
         <img
           src={user?.image}
           alt="User Avatar"
