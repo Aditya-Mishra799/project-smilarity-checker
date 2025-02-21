@@ -1,5 +1,5 @@
-import React from 'react';
-import Link from 'next/link';
+import React from "react";
+import Link from "next/link";
 
 const SimilarProjectsSection = ({ projects, sessionId }) => {
   return (
@@ -22,7 +22,17 @@ const SimilarProjectsSection = ({ projects, sessionId }) => {
                 {project.abstract}
               </p>
               <div className="flex items-center justify-between">
-                <span className="text-xs text-gray-500">
+                <span
+                  className={`text-xs font-semibold px-2 py-1 rounded-lg ${
+                    project.cosineSimilarity <= 0.2
+                      ? "bg-green-500 text-white" 
+                      : project.cosineSimilarity <= 0.5
+                      ? "bg-yellow-400 text-black" 
+                      : project.cosineSimilarity <= 0.8
+                      ? "bg-orange-500 text-white"
+                      : "bg-red-600 text-white" 
+                  }`}
+                >
                   Similarity: {(project.cosineSimilarity * 100).toFixed(2)}%
                 </span>
               </div>

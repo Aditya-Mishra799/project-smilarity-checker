@@ -10,6 +10,8 @@ import ConfirmationDialog from "@/components/ConfirmationDialog";
 import SimilarProjectsSection from "./SimilarProjectsSection";
 import axios from "axios";
 import Input from "@/components/Input";
+import Slider from "@/components/Slider";
+import LoadingFallback from "@/components/LoadingFallback";
 
 const ProjectDetails = ({ project, userAccess }) => {
   const { data: session } = useSession();
@@ -56,7 +58,11 @@ const ProjectDetails = ({ project, userAccess }) => {
   };
 
   useEffect(() => {
-    fetchSimilarProjects();
+    const debounceTimeout = setTimeout(() => {
+      fetchSimilarProjects();
+    }, 300);
+
+    return () => clearTimeout(debounceTimeout);
   }, [similarityCount, project._id]);
 
   const statusColors = {
@@ -92,7 +98,17 @@ const ProjectDetails = ({ project, userAccess }) => {
                   {project.status}
                 </span>
                 {maxSimilarity > 0 && (
-                  <span className="flex items-center gap-1 px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800">
+                  <span
+                    className={`flex items-center gap-1 px-3 py-1 rounded-full text-sm font-medium ${
+                      maxSimilarity <= 20
+                        ? "bg-green-500 text-white"
+                        : maxSimilarity <= 50
+                        ? "bg-yellow-400 text-black"
+                        : maxSimilarity <= 80
+                        ? "bg-orange-500 text-white"
+                        : "bg-red-600 text-white"
+                    }`}
+                  >
                     <AlertTriangle size={16} />
                     Max Similarity: {maxSimilarity.toFixed(2)}%
                   </span>
@@ -190,20 +206,16 @@ const ProjectDetails = ({ project, userAccess }) => {
 
       <div className="bg-white rounded-lg shadow-md p-6">
         <div className="mb-6">
-          <Input
+          <Slider
             value={similarityCount}
             onChange={(e) => setSimilarityCount(e.target.value)}
-            className = "w-min"
             label={"Limit"}
             min={1}
             max={20}
           />
         </div>
         {isLoadingSimilar ? (
-          <div className="text-center py-8">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600 mx-auto"></div>
-            <p className="mt-2 text-gray-600">Loading similar projects...</p>
-          </div>
+          <LoadingFallback />
         ) : (
           <SimilarProjectsSection
             projects={similarProjects}
