@@ -7,6 +7,44 @@ import Session from "@/models/session";
 import Project from "@/models/project";
 import User from "@/models/user";
 import { escapeRegExp } from "@/utils/basicUtils";
+import mongoose from "mongoose";
+
+export const getSessionProjectMetrics = async (sessionId) => {
+  if (!mongoose.isValidObjectId(sessionId)) {
+    throw new ClientError("Invalid Session Id Provided !!!!");
+  }
+  const session = await Session.findById(sessionId, {
+    _id: 1,
+  });
+  if (!session) {
+    throw new ClientError("Session not found !!!");
+  }
+  const projectCounts = await Project.aggregate([
+    {
+      $match: { sessionId: new mongoose.Types.ObjectId(sessionId) },
+    },
+    {
+      $group: {
+        _id: "$status",
+        count: { $sum: 1 },
+      },
+    },
+  ]);
+  const metrics = {
+    pending: 0,
+    accepted: 0,
+    rejected: 0,
+    total: 0,
+  };
+  for (const row of projectCounts) {
+    const { _id, count } = row;
+    if (metrics.hasOwnProperty(_id)) {
+      metrics[_id] += count;
+    }
+    metrics["total"] += count;
+  }
+  return metrics;
+};
 
 export const getSessionDetails = async (sessionId) => {
   try {
@@ -22,6 +60,7 @@ export const getSessionDetails = async (sessionId) => {
       .populate("creator", "name email")
       .populate("coAdmins", "name email")
       .lean();
+    const metrics = await getSessionProjectMetrics(sessionId);
     if (!session) {
       throw new ClientError("Session not found");
     }
@@ -45,6 +84,7 @@ export const getSessionDetails = async (sessionId) => {
             ...admin,
             _id: admin._id.toString(),
           })),
+          metrics,
         },
         userAccess: {
           isCreator,
@@ -54,6 +94,7 @@ export const getSessionDetails = async (sessionId) => {
       },
     };
   } catch (error) {
+    console.error(error)
     if (error instanceof ClientError) {
       return {
         success: false,

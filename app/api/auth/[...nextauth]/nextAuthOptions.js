@@ -42,7 +42,6 @@ const authOptions = {
           }
         } catch (error) {
           return null
-          console.error(error)
         }
       },
     }),
@@ -64,10 +63,9 @@ const authOptions = {
       return token;
     },
     async session({session, token}) {
-      if(token){
+      if (!token) return null; 
         session.user.id = token.id
         session.user.image = token.picture
-      }
       return session;
     },
     secret: process.env.NEXTAUTH_SECRET,

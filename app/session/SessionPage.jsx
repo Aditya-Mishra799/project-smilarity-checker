@@ -12,7 +12,7 @@ import SessionSkeleton from "./SessionSkeleton";
 
 const ITEMS_PER_PAGE = 10;
 
-const SavedSessionPage = ({
+const SessionPage = ({
   success,
   sessions: initialSessions = [],
   totalSessions: initialTotal = 0,
@@ -203,4 +203,4 @@ const SavedSessionPage = ({
   );
 };
 
-export default SavedSessionPage;
+export default SessionPage;

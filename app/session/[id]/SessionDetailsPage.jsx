@@ -31,6 +31,7 @@ import Link from "next/link";
 import ConfirmationDialog from "@/components/ConfirmationDialog";
 import AddCoAdminModal from "./AddCoAdminModal";
 import Button from "@/components/Button";
+import SessionMetrics from "../SessionMetrics";
 
 const SessionDetailsPage = ({ id, session, userAccess }) => {
   const { data: sessionData } = useSession();
@@ -323,6 +324,7 @@ const SessionDetailsPage = ({ id, session, userAccess }) => {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
+          <SessionMetrics metrics = {session.metrics}/>
             <div className="bg-gray-50 rounded-lg p-4">
               <div className="text-sm font-medium text-gray-500">Status</div>
               <div className="mt-1 text-lg font-semibold text-gray-900">
