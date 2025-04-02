@@ -3,7 +3,6 @@ import React, { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import { FileImage, Loader2, Upload, User } from "lucide-react";
 import { useToast } from "@/components/toast/ToastProvider";
-import { getViewURL, getUploadURL } from "@/server-actions/s3Actions";
 import { updateProfileImage } from "@/server-actions/userProfileActions";
 import axios from "axios";
 
@@ -13,59 +12,6 @@ const ProfilePage = ({ initialData }) => {
   const [isUploading, setIsUploading] = useState(false);
   const [profileData, setProfileData] = useState(initialData);
   const [profileImageUrl, setProfileImageUrl] = useState(null);
-
-  useEffect(() => {
-    const fetchProfileImage = async () => {
-      if (profileData?.profileImageKey) {
-        const response = await getViewURL(profileData.profileImageKey);
-        if (response.success) {
-          setProfileImageUrl(response.data.url);
-        }
-      }
-    };
-    fetchProfileImage();
-  }, [profileData?.profileImageKey]);
-
-  const handleImageUpload = async (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
-
-    if (!file.type.startsWith("image/")) {
-      addToast("error", "Please select an image file");
-      return;
-    }
-
-    const maxSize = 5 * 1024 * 1024; // 5MB
-    if (file.size > maxSize) {
-      addToast("error", "Image size should be less than 5MB");
-      return;
-    }
-
-    setIsUploading(true);
-    try {
-      const uploadUrlResponse = await getUploadURL(file.name, file.type, false);
-      if (!uploadUrlResponse.success) {
-        throw new Error(uploadUrlResponse.message);
-      }
-
-      await axios.put(uploadUrlResponse.data.uploadUrl, file, {
-        headers: { "Content-Type": file.type },
-      });
-
-      const updateResponse = await updateProfileImage(uploadUrlResponse.data.key);
-      if (!updateResponse.success) {
-        throw new Error(updateResponse.message);
-      }
-
-      setProfileData(prev => ({ ...prev, profileImageKey: uploadUrlResponse.data.key }));
-      await update({ image: uploadUrlResponse.data.key });
-      addToast("success", "Profile image updated successfully");
-    } catch (error) {
-      addToast("error", "Failed to update profile image");
-    } finally {
-      setIsUploading(false);
-    }
-  };
 
   return (
     <div className="max-w-4xl mx-auto p-6">
@@ -99,7 +45,7 @@ const ProfilePage = ({ initialData }) => {
                 id="profile-image"
                 className="hidden"
                 accept="image/*"
-                onChange={handleImageUpload}
+                onChange={()=> {}}
                 disabled={isUploading}
               />
             </div>
@@ -109,6 +55,7 @@ const ProfilePage = ({ initialData }) => {
                 {session?.user?.name}
               </h1>
               <p className="text-gray-600 mb-4">{session?.user?.email}</p>
+              <p className="text-gray-600 mb-4"><span className="font-semibold">Role:</span> {session?.user?.role}</p>
             </div>
           </div>
 
