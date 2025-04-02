@@ -13,7 +13,6 @@ const page = async ({ searchParams }) => {
       return notFound();
     }
     const { name, description, threshold, autoReject, status } = response.data;
-    console.log(status)
     defaultValue = {
       name,
       description,

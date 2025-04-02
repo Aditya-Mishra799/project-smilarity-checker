@@ -16,6 +16,7 @@ const NavLinks = ({user}) => {
         { title: 'About', href: '/about', visibility: true },
         { title: 'Sessions', href: '/session', visibility: true },
         { title: 'Contact', href: '/contact', visibility: true },
+        { title: 'User Manager', href: '/user-management/grant', visibility: user?.role === "super-admin" },
       ];
       return (
         <>

@@ -72,7 +72,6 @@ const UpsertSession = ({ id, user, defaultValue }) => {
   const createOrUpdateSession = useApiHandler(async (data) => {
     try {
       let response;
-      console.log(data)
       if (id) {
         response = await updateSession(id, data);
       } else {

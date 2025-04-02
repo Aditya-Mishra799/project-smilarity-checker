@@ -39,6 +39,7 @@ const authOptions = {
             email: user.email,
             name : user.name,
             picture : user.profileImageUrl,
+            role: user.role,
           }
         } catch (error) {
           return null
@@ -59,6 +60,7 @@ const authOptions = {
       if(user){
         token.id = user.id
         token.picture = user.picture
+        token.role = user.role
       } 
       return token;
     },
@@ -66,6 +68,7 @@ const authOptions = {
       if (!token) return null; 
         session.user.id = token.id
         session.user.image = token.picture
+        session.user.role = token.role
       return session;
     },
     secret: process.env.NEXTAUTH_SECRET,

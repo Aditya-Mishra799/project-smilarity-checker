@@ -80,7 +80,6 @@ export const updateSession = async (sessionId, updates) => {
     const filteredUpdates = Object.fromEntries(
       Object.entries(updates).filter(([_, value]) => value !== undefined)
     );
-    console.log(filteredUpdates)
 
     await Session.updateOne({ _id: sessionId }, { $set: filteredUpdates });
 
