@@ -99,7 +99,7 @@ const UserTable = ({ type, limit = 20, page = 1 }) => {
         ) : (
           <>
             {paginationData.totalPages > 0 && (
-              <h2 className="text-lg font-thin text-center my-4 text-slate-700 tracking-wider">
+              <h2 className="text-lg font-normal text-center my-4 text-slate-700 tracking-wider">
                 Page {paginationData.page} of {paginationData.totalPages}
               </h2>
             )}
@@ -127,16 +127,16 @@ const UserTable = ({ type, limit = 20, page = 1 }) => {
                   : users.length > 0 &&
                     users.map(({ name, email, role, _id }) => (
                       <tr className="border-b" key={_id}>
-                        <td className="w-fit text-nowrap px-4 py-2 text-sm font-thin tracking-wide">
+                        <td className="w-fit text-nowrap px-4 py-2 text-sm font-normal tracking-wide">
                           {name}
                         </td>
-                        <td className="w-fit text-nowrap px-4 py-2 text-xs font-thin tracking-wide">
+                        <td className="w-fit text-nowrap px-4 py-2 text-xs font-normal tracking-wide">
                           {email}
                         </td>
-                        <td className="w-fit text-nowrap px-4 py-2 text-xs font-thin tracking-wide">
+                        <td className="w-fit text-nowrap px-4 py-2 text-xs font-normal tracking-wide">
                           {role}
                         </td>
-                        <td className="w-fit text-nowrap px-4 py-2 text-xs font-thin tracking-wide">
+                        <td className="w-fit text-nowrap px-4 py-2 text-xs font-normal tracking-wide">
                           {selectedUser && selectedUser === _id ? (
                             <span className="bg-gray-50 text-gray-700 px-2 py-1 flex items-center  gap-2 text-xs w-full">
                               Updating <Loader2 className="animate-spin" />
@@ -206,13 +206,13 @@ const UserTable = ({ type, limit = 20, page = 1 }) => {
           </button>
         </div>
         <div className="flex gap-2 text-base items-center">
-          <label htmlFor="limit" className="text-base font-thin">
+          <label htmlFor="limit" className="text-base font-normal">
             Show:
           </label>
           <select
             id="limit"
             name="limit"
-            className="outline-none border border-indigo-500 rounded text-sm font-thin disabled:bg-gray-200 disabled:border-gray-700 disabled:cursor-not-allowed"
+            className="outline-none border border-indigo-500 rounded text-sm font-normal disabled:bg-gray-200 disabled:border-gray-700 disabled:cursor-not-allowed"
             value={paginationData.limit}
             disabled={
               fetchUsers.apiState.loading ||
