@@ -9,7 +9,6 @@ import {
   ChevronLeft,
   ChevronRight,
   Loader2,
-  MoveLeftIcon,
   ShieldCheck,
   ShieldX,
 } from "lucide-react";
@@ -21,6 +20,7 @@ const limitOptions = [5, 10, 20, 30, 50];
 const UserTable = ({ type, limit = 20, page = 1 }) => {
   const [users, setUsers] = useState([]);
   const [reload, setReload] = useState(false);
+  const [query, setQuery] = useState("");
   const [paginationData, setPaginationData] = useState({
     limit: limit,
     page: page,
@@ -34,7 +34,7 @@ const UserTable = ({ type, limit = 20, page = 1 }) => {
       const response = await getUsers(
         paginationData.page,
         paginationData.limit,
-        "",
+        query,
         type
       );
       if (!response.success) throw new Error(response.message);
@@ -61,10 +61,11 @@ const UserTable = ({ type, limit = 20, page = 1 }) => {
       setSelectedUser(null);
     }
   });
-
   useEffect(() => {
-    fetchUsers.execute();
-  }, [reload, paginationData.limit, paginationData.page]);
+    let timer = setTimeout(fetchUsers.execute, 300);
+    return () => clearTimeout(timer);
+  }, [reload, paginationData.limit, paginationData.page, query]);
+
   const skeleton = (
     <>
       {[...Array(8)].map((_, index) => (
@@ -94,7 +95,7 @@ const UserTable = ({ type, limit = 20, page = 1 }) => {
   return (
     <div className="w-full">
       <div className="w-full max-auto max-w-4xl overflow-x-auto">
-        {users.length === 0 && !fetchUsers.apiState.loading ? (
+        {users.length === 0 && !fetchUsers.apiState.loading && query === "" ? (
           NotFoundPlaceHolder
         ) : (
           <>
@@ -103,6 +104,14 @@ const UserTable = ({ type, limit = 20, page = 1 }) => {
                 Page {paginationData.page} of {paginationData.totalPages}
               </h2>
             )}
+            <div className="flex justify-between gap-4 mb-4 mx-4">
+              <input
+                className="w-full flex-4 border border-indigo-600 px-4 py-2 rounded-md shadow-md focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-0 mt-4"
+                placeholder="Search by Email or Name"
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+              />
+            </div>
 
             <table className="min-w-full  border-gray-300 mb-4">
               <thead className="bg-slate-50 border-b">
