@@ -1,36 +1,127 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# Project Similarity Checker
 
-## Getting Started
+A powerful web application that uses advanced NLP and AI techniques to detect similarities between project proposals, helping maintain academic integrity and prevent duplication.
 
-First, run the development server:
+## Features
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+- **AI-Powered Analysis**: Advanced NLP algorithms analyze project proposals to detect similarities with existing submissions
+- **Real-time Processing**: Instant feedback on project similarity with existing submissions
+- **Bulk Upload Support**: Upload and analyze multiple projects simultaneously
+- **Customizable Thresholds**: Set specific similarity thresholds based on your institution's requirements
+- **Detailed Reports**: Get comprehensive similarity reports with percentage matches and source references
+- **Role-based Access**: Different access levels for students, administrators, and super-administrators
+- **Session Management**: Create and manage multiple project submission sessions
+- **Email Verification**: Secure user registration with email verification
+- **Responsive Design**: Works seamlessly across desktop and mobile devices
+
+## Tech Stack
+
+- **Frontend**: Next.js 15, React 19, TailwindCSS
+- **Backend**: Next.js API Routes, MongoDB
+- **Authentication**: NextAuth.js
+- **Email Service**: Nodemailer
+- **Form Handling**: React Hook Form, Zod validation
+- **UI Components**: Custom components with Tailwind CSS
+
+## Prerequisites
+
+Before you begin, ensure you have the following installed:
+- Node.js (v18 or higher)
+- npm (v9 or higher)
+- MongoDB instance (local or Atlas)
+
+## Environment Variables
+
+Create a `.env.local` file in the root directory with the following variables:
+
+```env
+# App
+NEXT_PUBLIC_URL=http://localhost:3000
+SERVER_MODE=development
+
+# MongoDB
+MONGODB_URI=your_mongodb_connection_string
+DATABASE_NAME=your_database_name
+
+# NextAuth
+NEXTAUTH_SECRET=your_nextauth_secret
+NEXTAUTH_URL=http://localhost:3000
+NEXTAUTH_URL_INTERNAL=http://localhost:3000
+
+# Email (Gmail)
+EMAIL_ID=your_email@gmail.com
+EMAIL_PASSWORD=your_email_app_password
+
+# JWT
+JWT_SECRET=your_jwt_secret
+
+# API
+NEXT_PUBLIC_SIMILARITY_API_ENDPOINT_BASE_URL=your_similarity_api_endpoint
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Installation
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+1. Clone the repository:
+```bash
+git clone https://github.com/yourusername/project-similarity-checker.git
+cd project-similarity-checker
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+2. Install dependencies:
+```bash
+npm install
+```
 
-## Learn More
+3. Run the development server:
+```bash
+npm run dev
+```
 
-To learn more about Next.js, take a look at the following resources:
+4. Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Project Structure
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```
+├── app/                    # Next.js app directory
+│   ├── api/               # API routes
+│   ├── auth/              # Authentication pages
+│   ├── session/           # Session management
+│   └── user-management/   # User management
+├── components/            # Reusable React components
+├── lib/                   # Utility functions and configurations
+├── models/               # MongoDB models
+├── public/               # Static assets
+└── server-actions/       # Server-side actions
+```
 
-## Deploy on Vercel
+## Key Features Explained
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+### Session Management
+- Create new sessions with customizable thresholds
+- Add co-administrators to help manage sessions
+- Bulk upload projects via CSV
+- Export session data to CSV
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+### Project Submission
+- Submit individual projects with title and abstract
+- Real-time similarity checking
+- Automatic status updates based on similarity threshold
+- Detailed similarity reports
+
+### User Management
+- Role-based access control
+- Email verification for new users
+- Profile management
+- Super-admin controls for role management
+
+## Contributing
+
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
